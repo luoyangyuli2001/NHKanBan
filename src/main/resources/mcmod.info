@@ -1,0 +1,21 @@
+{
+  "modListVersion": 2,
+  "modList": [{
+    "modid": "${modId}",
+    "name": "${modName}",
+    "description": "A community task board mod for GTNH. Players can create, claim, assign, and track tasks via a Kanban-style board.",
+    "version": "${modVersion}",
+    "mcversion": "${minecraftVersion}",
+    "url": "https://github.com/luoyangyuli2001/NHKanBan",
+    "updateUrl": "",
+    "authorList": ["LuoYangYuLi"],
+    "credits": "Built on the GTNH ExampleMod template by SinTh0r4s.",
+    "logoFile": "",
+    "screenshots": [],
+    "parent": "",
+    "requiredMods": [],
+    "dependencies": [],
+    "dependants": [],
+    "useDependencyInformation": false
+  }]
+}
