@@ -113,8 +113,8 @@ public class KanbanCommand extends CommandBase {
         String title = null;
         String description = "";
         TaskPriority priority = TaskPriority.NORMAL;
-        TaskScope scope = TaskScope.GLOBAL;
-        int maxClaimers = 1;
+        TaskScope scope = TaskScope.TEAM;
+        int maxClaimers = 3;
         Long deadline = null;
 
         int i = 0;
@@ -569,8 +569,8 @@ public class KanbanCommand extends CommandBase {
                 + Task.MAX_DESCRIPTION_LENGTH
                 + " chars, multi-word ok)");
         reply(sender, EnumChatFormatting.GRAY + "  -p, --priority  LOW|NORMAL|HIGH|URGENT (default NORMAL)");
-        reply(sender, EnumChatFormatting.GRAY + "  -s, --scope     GLOBAL|TEAM|DIRECT     (default GLOBAL)");
-        reply(sender, EnumChatFormatting.GRAY + "  -c, --claimers  <number>               (default 1)");
+        reply(sender, EnumChatFormatting.GRAY + "  -s, --scope     GLOBAL|TEAM|DIRECT     (default TEAM)");
+        reply(sender, EnumChatFormatting.GRAY + "  -c, --claimers  <number>               (default 3)");
         reply(sender, EnumChatFormatting.GRAY + "  -e, --deadline  <hours from now>");
         reply(sender, EnumChatFormatting.GRAY + "Note: -t and -d consume all words until the next -flag.");
         reply(sender, EnumChatFormatting.GRAY + "Examples:");
