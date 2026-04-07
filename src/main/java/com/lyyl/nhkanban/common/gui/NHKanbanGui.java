@@ -37,7 +37,14 @@ import com.lyyl.nhkanban.common.task.TaskScope;
  */
 public final class NHKanbanGui {
 
-    private static final int MAX_LIST_SIZE = 20;
+    /**
+     * 单 Tab 任务数量上限,跨 status 桶共享配额。早期防御性截断,
+     * 避免列表过长撑爆 packet。Step 8 加上滚动后渲染层不再是瓶颈,
+     * 放宽到 200——单 TaskSummary ~50 字节,200 条 ~10KB,远小于
+     * SimpleNetworkWrapper 32KB 上限。真要支持上千任务的玩家需要走
+     * 客户端分页 + RequestTaskListPacket 带 page 参数,那是 v2 工作。
+     */
+    private static final int MAX_LIST_SIZE = 200;;
 
     /** 列表排序:URGENT 在前,同优先级新的在前。 */
     private static final Comparator<Task> TASK_ORDER = new Comparator<Task>() {
