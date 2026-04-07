@@ -3,26 +3,29 @@ package com.lyyl.nhkanban.client.ui.widget;
 import java.util.Collections;
 import java.util.List;
 
-import com.lyyl.nhkanban.common.network.TaskSummary;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.widgets.ListWidget;
 import com.cleanroommc.modularui.widgets.TextWidget;
 import com.cleanroommc.modularui.widgets.layout.Column;
+import com.lyyl.nhkanban.common.network.TaskSummary;
 
 /**
  * 看板的一列。结构:列标题(固定高度) + 滚动卡片列表(占满剩余空间)。
  *
- * <p>滚动用 ListWidget 完成。注意必须用批量 children(iterable, factory) API
+ * <p>
+ * 滚动用 ListWidget 完成。注意必须用批量 children(iterable, factory) API
  * 一次性添加所有卡片,不能用 child(widget) 在循环里逐个添加——后者会触发
  * ListWidget 的尺寸计算在子项 widthRel 解析之前发生,导致卡片宽度退化成
  * 内容自适应(中文字符竖排)。批量 API 走的是另一条 init 路径,可以正确
  * 传播宽度。这是 Step 5b 翻车的真正原因,绕了一大圈才搞清。
  *
- * <p>setter 顺序也有讲究:widthRel → expanded → children,跟 MUI2 test code
+ * <p>
+ * setter 顺序也有讲究:widthRel → expanded → children,跟 MUI2 test code
  * 里的工作示例完全一致。颠倒顺序可能再次触发 sizing 计算时机问题。
  *
- * <p>cards 允许为 null 或空——空列只显示标题,内部 list 仍然存在但没子项。
+ * <p>
+ * cards 允许为 null 或空——空列只显示标题,内部 list 仍然存在但没子项。
  */
 public final class KanbanColumnWidget {
 
