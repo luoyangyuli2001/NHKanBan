@@ -2,6 +2,8 @@ package com.lyyl.nhkanban.common.network;
 
 import com.lyyl.nhkanban.NHKanBan;
 import com.lyyl.nhkanban.client.network.TaskListPacketHandler;
+import com.lyyl.nhkanban.common.network.packet.CreateTaskPacket;
+import com.lyyl.nhkanban.common.network.packet.RequestTaskListPacket;
 import com.lyyl.nhkanban.common.network.packet.TaskListPacket;
 
 import cpw.mods.fml.common.network.NetworkRegistry;
@@ -35,7 +37,8 @@ public final class NHKanbanNet {
     }
 
     public static void registerCommonPackets() {
-        // C → S 包在这里注册
+        CHANNEL.registerMessage(RequestTaskListPacketHandler.class, RequestTaskListPacket.class, nextId(), Side.SERVER);
+        CHANNEL.registerMessage(CreateTaskPacketHandler.class, CreateTaskPacket.class, nextId(), Side.SERVER);
     }
 
     public static void registerClientPackets() {

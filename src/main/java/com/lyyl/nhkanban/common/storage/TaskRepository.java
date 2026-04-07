@@ -98,6 +98,17 @@ public class TaskRepository {
         return result;
     }
 
+    /** 按 DIRECT 任务的 target 玩家筛选,只返回 scope=DIRECT 的任务 */
+    public List<Task> findByTarget(UUID target) {
+        List<Task> result = new ArrayList<Task>();
+        for (Task t : tasks.values()) {
+            if (target.equals(t.getTargetPlayer())) {
+                result.add(t);
+            }
+        }
+        return result;
+    }
+
     /** 某玩家发布的活跃(非终态)任务数,用于配额校验 */
     public int countActiveByAuthor(UUID author) {
         int count = 0;

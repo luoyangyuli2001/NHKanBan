@@ -8,6 +8,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
+import com.lyyl.nhkanban.common.gui.GuiContext;
 import com.lyyl.nhkanban.common.gui.NHKanbanGui;
 import com.lyyl.nhkanban.common.network.ViewTab;
 
@@ -44,7 +45,7 @@ public class BlockTaskBoard extends Block {
         }
         TileEntity te = world.getTileEntity(x, y, z);
         if (te instanceof TileTaskBoard) {
-            NHKanbanGui.openMainBoard((EntityPlayerMP) player, (TileTaskBoard) te, ViewTab.MINE);
+            NHKanbanGui.openMainBoard((EntityPlayerMP) player, GuiContext.forTile(x, y, z), ViewTab.MINE);
         }
         return true;
     }

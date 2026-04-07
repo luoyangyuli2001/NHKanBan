@@ -6,12 +6,16 @@ import java.util.List;
 import com.lyyl.nhkanban.common.network.TaskSummary;
 import com.lyyl.nhkanban.common.network.ViewTab;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-
 /**
  * 客户端唯一的任务数据来源。Widget 只能从这里读,严禁绕过去访问 TaskRepository
  * ——后者是服务端 singleton,客户端 JVM 上永远是空的,在专用服上会渲染出空看板。
+ *
+ * <p>
+ * 注意:虽然这个 cache 概念上是 client-only,但类本身没有 @SideOnly 注解,
+ * 因为 MUI2 的 buildUI 在两端都会跑,而 panel 构建时需要按 cache 内容生成
+ * widget 树(数量取决于任务数,无法用 supplier 延迟)。让 cache 类双端都能
+ * 加载、服务端持有空 singleton,这样 panel 构建逻辑可以保持单一代码路径,
+ * 不需要按 side 分支。
  *
  * <p>
  * 只由网络包 handler 写入,Widget 只读。不持久化,关闭客户端即丢失;每次开 GUI
@@ -21,7 +25,6 @@ import cpw.mods.fml.relauncher.SideOnly;
  * handler 在网络线程写、GUI 在主线程读,所以读写都加 synchronized。getTasks
  * 返回不可变拷贝,避免读迭代时被并发替换。
  */
-@SideOnly(Side.CLIENT)
 public final class ClientTaskCache {
 
     private static final ClientTaskCache INSTANCE = new ClientTaskCache();

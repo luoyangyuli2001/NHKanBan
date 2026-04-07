@@ -10,6 +10,7 @@ import com.cleanroommc.modularui.screen.UISettings;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.lyyl.nhkanban.NHKanBan;
 import com.lyyl.nhkanban.client.ui.TaskBoardPanel;
+import com.lyyl.nhkanban.common.gui.GuiContext;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -26,15 +27,13 @@ import cpw.mods.fml.relauncher.SideOnly;
  *
  * <p>
  * buildUI 在客户端和服务端各跑一次,所以严禁在这里访问 TaskRepository
- * (在客户端会拿到空 repo)。Panel 内部读取数据必须通过 ClientTaskCache,
- * 且要确保只在 client-only 代码路径上引用 cache 类。
+ * (在客户端会拿到空 repo)。Panel 内部读取数据必须通过 ClientTaskCache。
  */
-
 public class TileTaskBoard extends TileEntity implements IGuiHolder<PosGuiData> {
 
     @Override
     public ModularPanel buildUI(PosGuiData data, PanelSyncManager syncManager, UISettings settings) {
-        return TaskBoardPanel.build();
+        return TaskBoardPanel.build(GuiContext.forTile(data.getX(), data.getY(), data.getZ()));
     }
 
     @Override

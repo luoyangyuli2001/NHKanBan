@@ -32,6 +32,8 @@ public class Task {
 
     private List<String> tags = new ArrayList<String>();
     private List<UUID> claimers = new ArrayList<UUID>();
+    /** 仅 DIRECT 任务有意义,其他 scope 为 null */
+    private UUID targetPlayer;
     private List<Comment> comments = new ArrayList<Comment>();
 
     /** 乐观锁,每次写 +1 */
@@ -178,6 +180,14 @@ public class Task {
 
     public void setComments(List<Comment> comments) {
         this.comments = comments;
+    }
+
+    public UUID getTargetPlayer() {
+        return targetPlayer;
+    }
+
+    public void setTargetPlayer(UUID targetPlayer) {
+        this.targetPlayer = targetPlayer;
     }
 
     public int getVersion() {

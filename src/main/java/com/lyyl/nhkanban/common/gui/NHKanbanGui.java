@@ -2,12 +2,14 @@ package com.lyyl.nhkanban.common.gui;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.tileentity.TileEntity;
 
 import com.cleanroommc.modularui.factory.GuiFactories;
 import com.lyyl.nhkanban.common.block.TileTaskBoard;
@@ -24,25 +26,54 @@ import com.lyyl.nhkanban.common.task.TaskScope;
  *
  * <p>
  * 顺序很关键:先 sendTo,后 open。SimpleNetworkWrapper 入队比 MUI2 的 open
- * 命令快得多(open 要序列化整个 widget 树),实测客户端 buildUI 执行前数据包
- * 已经到位,所以打开 GUI 时 ClientTaskCache 就有内容。颠倒顺序会让首次渲染
- * 看到空 cache,出现"先空帧再刷新"的视觉跳变。
+ * 命令快得多,实测客户端 buildUI 执行前数据包已经到位,所以打开 GUI 时
+ * ClientTaskCache 就有内容。颠倒顺序会让首次渲染看到空 cache,出现
+ * "先空帧再刷新"的视觉跳变。
  *
  * <p>
- * 所有方块、道具的右键回调都应该走这一个入口,不要在调用方各自拼接
- * 推数据 + open 的代码,以免日后两边漂移。
+ * 来源(方块还是道具)由 GuiContext 区分,内部分支选不同的 MUI2 工厂。
+ * 所有方块/道具/包 handler 都走这一个入口,不要在调用方各自拼接,以免
+ * 日后两边漂移。
  */
 public final class NHKanbanGui {
 
     private static final int MAX_LIST_SIZE = 20;
 
+    /** 列表排序:URGENT 在前,同优先级新的在前。 */
+    private static final Comparator<Task> TASK_ORDER = new Comparator<Task>() {
+
+        @Override
+        public int compare(Task a, Task b) {
+            int p = b.getPriority()
+                .ordinal()
+                - a.getPriority()
+                    .ordinal();
+            if (p != 0) return p;
+            return Long.compare(b.getCreatedAt(), a.getCreatedAt());
+        }
+    };
+
     private NHKanbanGui() {}
 
-    public static void openMainBoard(EntityPlayerMP player, TileTaskBoard tile, ViewTab tab) {
+    public static void openMainBoard(EntityPlayerMP player, GuiContext ctx, ViewTab tab) {
+        if (player == null || ctx == null) return;
+
+        // 数据包总是先发,无论来源
         List<TaskSummary> summaries = querySummariesForTab(player, tab);
         NHKanbanNet.CHANNEL.sendTo(new TaskListPacket(tab, summaries), player);
+
+        if (ctx.isFromItem()) {
+            GuiFactories.playerInventory()
+                .openFromMainHand(player);
+            return;
+        }
+
+        // 方块路径:从 ctx 重新查 tile,顺便兜底"tile 已经被破坏"的情况
+        if (player.worldObj == null) return;
+        TileEntity te = player.worldObj.getTileEntity(ctx.getX(), ctx.getY(), ctx.getZ());
+        if (!(te instanceof TileTaskBoard)) return;
         GuiFactories.tileEntity()
-            .open(player, tile);
+            .open(player, (TileTaskBoard) te);
     }
 
     private static List<TaskSummary> querySummariesForTab(EntityPlayerMP player, ViewTab tab) {
@@ -73,12 +104,19 @@ public final class NHKanbanGui {
                 }
                 break;
             }
-            case INBOX:
+            case INBOX: {
+                raw = TaskRepository.get()
+                    .findByTarget(id);
+                break;
+            }
             case ARCHIVE:
             default:
                 raw = Collections.emptyList();
         }
 
+        if (!raw.isEmpty()) {
+            Collections.sort(raw, TASK_ORDER);
+        }
         if (raw.size() > MAX_LIST_SIZE) {
             raw = raw.subList(0, MAX_LIST_SIZE);
         }
